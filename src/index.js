@@ -1,8 +1,9 @@
 "use strict";
 
+const BbPromise = require("bluebird");
 const _ = require("lodash");
 const YAML = require("js-yaml");
-const walkDirSync = require("./libs/walkDirSync");
+const walkDirSync = require("./lib/walkDirSync");
 
 let shouldInclude = (filename, includes) => {
 
@@ -32,18 +33,28 @@ let filenameEndsWithExtension = (filename, extension) =>
 let isYamlFile = (filename) =>
     filenameEndsWithExtension(filename, "yml") || filenameEndsWithExtension(filename, "yaml");
 
+let correctHandlerLocation = (functionName, configFragment, relativeConfigFragmentFilePath) => {
+
+    const function_ = configFragment.functions[functionName];
+
+    if (function_.handler.indexOf(relativeConfigFragmentFilePath) !== 0) {
+        function_.handler = relativeConfigFragmentFilePath + "/" + function_.handler;
+    }
+};
 
 class ServerlessPluginColocate {
     constructor(serverless, options) {
-        let self = this;
         this.serverless = serverless;
         this.options = options;
-        this.appendConfig();
+        this.mergeCodeFragmentsIntoService();
 
         this.commands = {
             colocate: {
+                usage: "Colocate Configuration and Code",
+                lifecycleEvents: ["colocate"],
                 commands: {
                     effective: {
+                        usage: "Print the effective serverless.yml",
                         lifecycleEvents: ["effective"]
                     }
                 }
@@ -51,20 +62,24 @@ class ServerlessPluginColocate {
         };
 
         this.hooks = {
-            "colocate:effective:effective": function () {
-                self.printEffectiveConfig(self.serverless)
+            "colocate:colocate": () => {
+                this.serverless.cli.generateCommandsHelp(["colocate"]);
+                return BbPromise.resolve();
+            },
+            "colocate:effective:effective": () => {
+                this.printEffectiveConfig();
+                return BbPromise.resolve();
             }
         };
     }
 
-    printEffectiveConfig(serverless) {
+    printEffectiveConfig() {
 
-        let effectiveServiceConfig = {};
-
-        let fieldsToOutput = ["custom", "functions", "package", "provider", "resources", "service"];
+        const effectiveServiceConfig = {};
+        const fieldsToOutput = ["custom", "functions", "package", "provider", "resources", "service"];
 
         fieldsToOutput.forEach(fieldName => {
-            let fieldValue = serverless.service[fieldName];
+            let fieldValue = this.serverless.service[fieldName];
             if (fieldValue && Object.keys(fieldValue).length > 0) {
                 effectiveServiceConfig[fieldName] = fieldValue
             }
@@ -73,39 +88,34 @@ class ServerlessPluginColocate {
         console.log(YAML.dump(effectiveServiceConfig));
     }
 
-    appendConfig() {
+    mergeCodeFragmentsIntoService() {
+        this.getConfigFragmentFilenames()
+            .forEach((codeFragmentFilename) =>
+                this.mergeCodeFragmentIntoService(codeFragmentFilename));
+    }
+
+    mergeCodeFragmentIntoService(configFilename) {
+
         const servicePath = this.serverless.config.servicePath;
-        let serverless = this.serverless;
+        const configFragmentFilePath = configFilename.substr(0, configFilename.lastIndexOf("/"));
+        const relativeConfigFragmentFilePath = configFragmentFilePath.replace(servicePath + "/", "");
+        const configFragment = this.serverless.utils.readFileSync(configFilename);
 
-        let configFragmentFilenames = this.getConfigFragmentFilenames(servicePath);
+        if (configFragment) {
 
-        if (configFragmentFilenames.length > 0) {
-            configFragmentFilenames.forEach(function (configFilename) {
+            Object.keys(configFragment.functions).forEach(functionName =>
+                correctHandlerLocation(functionName, configFragment, relativeConfigFragmentFilePath));
 
-                let configFragmentFilePath = configFilename.substr(0, configFilename.lastIndexOf("/"));
-                let relativeConfigFragmentFilePath = configFragmentFilePath.replace(servicePath + "/", "");
-
-                let configFragment = serverless.utils.readFileSync(configFilename);
-                if (configFragment) {
-                    Object.keys(configFragment.functions).forEach(functionName => {
-                        let function_ = configFragment.functions[functionName];
-                        if (function_.handler.indexOf(relativeConfigFragmentFilePath) !== 0) {
-                            function_.handler = relativeConfigFragmentFilePath + "/" + function_.handler;
-                        }
-                    });
-
-                    this.serverless.service = _.merge(serverless.service || {}, configFragment);
-                }
-            }, this);
+            this.serverless.service = _.merge(this.serverless.service || {}, configFragment);
         }
     }
 
     getConfigFragmentFilenames() {
-        const servicePath = this.serverless.config.servicePath;
-        let files = walkDirSync(servicePath, {noLinks: true});
 
-        let includes = [];
-        let excludes = ["serverless.yml", "node_modules", ".serverless"];
+        const servicePath = this.serverless.config.servicePath;
+        const files = walkDirSync(servicePath, {noLinks: true});
+        const includes = [];
+        const excludes = ["serverless.yml", "node_modules", ".serverless"];
 
         return files
             .filter(filename => isYamlFile(filename))

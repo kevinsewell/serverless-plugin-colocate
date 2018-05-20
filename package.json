@@ -2,7 +2,7 @@
   "name": "serverless-plugin-colocate",
   "version": "0.0.1",
   "description": "Serverless Plugin to Colocate your Configuration and Code",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "lint": "standard src/**",
     "lint:fix": "standard --fix src/**"
@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/aronim/serverless-plugin-colocate",
   "dependencies": {
+    "bluebird": "^3.5.1",
     "js-yaml": "^3.11.0",
     "lodash": "^4.17.10"
   }
