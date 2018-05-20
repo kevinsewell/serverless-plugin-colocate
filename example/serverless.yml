@@ -1,0 +1,37 @@
+service: ServerlessColocateExample
+
+plugins:
+  - serverless-plugin-colocate
+
+provider:
+  name: aws
+  stage: ${opt:stage, "Test"}
+  runtime: nodejs8.10
+  role: DefaultRole
+
+resources:
+  Resources:
+    DefaultRole:
+      Type: AWS::IAM::Role
+      Properties:
+        Path: /
+        RoleName: ${self:service}-${self:provider.stage}
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: ${self:service}-${self:provider.stage}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                  Resource: arn:aws:logs:${self:provider.region}:*:log-group:/aws/lambda/*:*:*

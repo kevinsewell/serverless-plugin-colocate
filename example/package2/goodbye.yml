@@ -1,0 +1,30 @@
+provider:
+  environment:
+    GOODBYE_MESSAGE: Hamba kakuhle
+
+functions:
+  Goodbye:
+    handler: goodbye.handle
+    events:
+      - http:
+          path: goodbye
+          method: get
+          cors: true
+    
+resources:  
+  Resources:
+    GoodbyePolicy:
+      Type: AWS::IAM::Policy
+      DependsOn: DefaultRole
+      Properties:
+        PolicyName: ${self:service}-${self:provider.stage}-Goodbye
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource:
+                - arn:aws:s3:::package1/*
+        Roles:
+          - ${self:service}-${self:provider.stage}          
