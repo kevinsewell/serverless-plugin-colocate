@@ -1,13 +1,31 @@
 {
   "name": "serverless-plugin-colocate",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "Serverless Plugin to Colocate your Configuration and Code",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "standard src/**",
+    "lint:fix": "standard --fix src/**"
   },
-  "author": "",
+  "author": "Kevin W. Sewell",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aronim/serverless-plugin-colocate.git"
+  },
+  "keywords": [
+    "serverless plugin colocate lambdas",
+    "serverless colocate",
+    "serverless plugin",
+    "lambda serverless",
+    "colocate lambda",
+    "config fragments",
+    "split config"
+  ],
+  "bugs": {
+    "url": "https://github.com/aronim/serverless-plugin-colocate/issues"
+  },
+  "homepage": "https://github.com/aronim/serverless-plugin-colocate",
   "dependencies": {
     "js-yaml": "^3.11.0",
     "lodash": "^4.17.10"
