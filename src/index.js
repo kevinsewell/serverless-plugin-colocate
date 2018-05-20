@@ -101,7 +101,7 @@ class ServerlessPluginColocate {
         const relativeConfigFragmentFilePath = configFragmentFilePath.replace(servicePath + "/", "");
         const configFragment = this.serverless.utils.readFileSync(configFilename);
 
-        if (configFragment) {
+        if (configFragment && configFragment.functions) {
 
             Object.keys(configFragment.functions).forEach(functionName =>
                 correctHandlerLocation(functionName, configFragment, relativeConfigFragmentFilePath));
