@@ -105,9 +105,9 @@ class ServerlessPluginColocate {
 
             Object.keys(configFragment.functions).forEach(functionName =>
                 correctHandlerLocation(functionName, configFragment, relativeConfigFragmentFilePath));
-
-            this.serverless.service = _.merge(this.serverless.service || {}, configFragment);
         }
+
+        this.serverless.service = _.merge(this.serverless.service || {}, configFragment);
     }
 
     getConfigFragmentFilenames() {
