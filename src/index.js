@@ -101,6 +101,13 @@ class ServerlessPluginColocate {
         const relativeConfigFragmentFilePath = configFragmentFilePath.replace(servicePath + "/", "");
         const configFragment = this.serverless.utils.readFileSync(configFilename);
 
+        // ignore field is present and true then ignore
+        if (configFragment.ignore) {
+            console.log("Colocate Plugin is ignoring " + configFilename.replace(servicePath, ""));
+            return;
+        }
+        delete configFragment.ignore;
+
         if (configFragment && configFragment.functions) {
 
             Object.keys(configFragment.functions).forEach(functionName =>

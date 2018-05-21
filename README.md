@@ -245,10 +245,23 @@ resources:
           - ${self:service}-${self:provider.stage}
 ```
 
-#### NB
-The plugin will prepend the correct path to function handler: ie. in the hello.yml the handler is simply `handler: hello.handle` 
-but in the effective serverless.yml the Hello function handler is `handler: package1/hello.handle`
+#### Function Handler Path
+The plugin will prepend the correct path to function handler: ie. in the hello.yml the handler is simply 
+`handler: hello.handle` but in the effective serverless.yml the Hello function handler is 
+`handler: package1/hello.handle`
 
+#### Skip a specific configuration file
+If you want the plugin to ignore a particular configuration file, simply add `ignore: true` to the root of the 
+configuration file. This is simpler than commenting out the entire file.
+
+```yaml
+ignore: true
+
+functions:
+  Hello:
+    handler: hello.handle  
+
+```
 
 ## Contribute
 
