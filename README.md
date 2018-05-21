@@ -157,10 +157,10 @@ resources:
 ##### Effective serverless.yml
 ```yaml
 
-service: Anahata-ServerlessSplitConfigExample
+service: ServerlessColocateExample
 
 plugins:
-  - serverless-splitconfig
+  - serverless-plugin-colocate
 
 provider:
   name: aws
