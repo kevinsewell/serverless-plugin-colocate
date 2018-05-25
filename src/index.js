@@ -85,7 +85,7 @@ class ServerlessPluginColocate {
             }
         });
 
-        console.log(YAML.dump(effectiveServiceConfig));
+        this.serverless.cli.log("Effective serverless.yml:\n" + YAML.dump(effectiveServiceConfig));
     }
 
     mergeCodeFragmentsIntoService() {
@@ -103,7 +103,7 @@ class ServerlessPluginColocate {
 
         // ignore field is present and true then ignore
         if (configFragment.ignore) {
-            console.log("Colocate Plugin is ignoring " + configFilename.replace(servicePath, ""));
+            this.serverless.cli.log("Colocate is ignoring " + configFilename.replace(servicePath, ""));
             return;
         }
         delete configFragment.ignore;
