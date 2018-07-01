@@ -30,6 +30,20 @@ plugins:
   - serverless-plugin-colocate
 ```
 
+### Configuration Options
+```yml
+custom:
+  colocate:
+    defaultInclude:         # Optional: For very edge cases where these includes don't meet your needs
+      - "**/*.yml"
+      - "**/*.yaml"
+    defaultExclude:         # Optional: For very edge cases where these includes don't meet your needs
+      - "serverless.yml"
+      - "node_modules/**"
+    exclude:                # Optional: Exclude additional patterns from fragment search
+      - "**/goodbye.yml"
+```
+
 ### Example 
 
 ##### Project Structure
