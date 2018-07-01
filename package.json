@@ -28,6 +28,7 @@
   "homepage": "https://github.com/aronim/serverless-plugin-colocate",
   "dependencies": {
     "bluebird": "^3.5.1",
+    "globby": "^8.0.1",
     "js-yaml": "^3.11.0",
     "lodash": "^4.17.10"
   }

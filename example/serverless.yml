@@ -9,6 +9,11 @@ provider:
   runtime: nodejs8.10
   role: DefaultRole
 
+custom:
+  colocate:
+    exclude:
+      - "**/goodbye.yml"
+
 resources:
   Resources:
     DefaultRole:
