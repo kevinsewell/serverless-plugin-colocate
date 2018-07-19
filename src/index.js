@@ -130,7 +130,7 @@ class ServerlessPluginColocate {
      */
     mergeCodeFragmentsIntoService() {
         this.getConfigFragmentFilenames()
-            .then(filePaths => filePaths.forEach(this.mergeConfigFragmentIntoService.bind(this)));
+            .forEach(this.mergeConfigFragmentIntoService.bind(this));
     }
 
     /**
@@ -181,7 +181,7 @@ class ServerlessPluginColocate {
         this.getCustomExclude()
             .forEach((pattern) => addExcludePattern(pattern, patterns));
 
-        return globby(patterns, {
+        return globby.sync(patterns, {
             cwd: servicePath,
             silent: true,
             follow: true,
