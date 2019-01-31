@@ -120,7 +120,7 @@ class ServerlessPluginColocate {
             }
         });
 
-        this.serverless.cli.log("Effective serverless.yml:\n" + YAML.dump(this.serverless.service));
+        this.serverless.cli.log("Effective serverless.yml:\n" + YAML.dump(effectiveServiceConfig));
 
         return BbPromise.resolve();
     }
