@@ -111,7 +111,7 @@ class ServerlessPluginColocate {
     printEffectiveConfig() {
 
         const effectiveServiceConfig = {};
-        const fieldsToOutput = ["custom", "functions", "package", "provider", "resources", "service"];
+        const fieldsToOutput = ["custom", "functions", "layers", "package", "provider", "resources", "service"];
 
         fieldsToOutput.forEach(fieldName => {
             let fieldValue = this.serverless.service[fieldName];
@@ -120,7 +120,7 @@ class ServerlessPluginColocate {
             }
         });
 
-        this.serverless.cli.log("Effective serverless.yml:\n" + YAML.dump(effectiveServiceConfig));
+        this.serverless.cli.log("Effective serverless.yml:\n" + YAML.dump(this.serverless.service));
 
         return BbPromise.resolve();
     }
