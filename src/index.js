@@ -111,7 +111,7 @@ class ServerlessPluginColocate {
     printEffectiveConfig() {
 
         const effectiveServiceConfig = {};
-        const fieldsToOutput = ["custom", "functions", "package", "provider", "resources", "service"];
+        const fieldsToOutput = ["custom", "functions", "layers", "package", "provider", "resources", "service"];
 
         fieldsToOutput.forEach(fieldName => {
             let fieldValue = this.serverless.service[fieldName];
@@ -158,9 +158,36 @@ class ServerlessPluginColocate {
             Object.keys(configFragment.functions).forEach(functionName =>
                 correctHandlerLocation(functionName, configFragment, relativeConfigFragmentFilePath));
         }
+        
+        if (configFragment && configFragment.layers) {
+            Object.keys(configFragment.layers).forEach(layerName => {
+                if (configFragment.layers[layerName].package && configFragment.layers[layerName].package.artifact){
+                    configFragment.layers[layerName].package.artifact = 
+                        this.updateLocation(configFragment.layers[layerName].package.artifact, relativeConfigFragmentFilePath)
+                }
+            });
+             
+        }
 
         this.serverless.service = _.merge(this.serverless.service || {}, configFragment);
     }
+    
+    /**
+     * Return string with updated location
+     *
+     * @param originalLocation String
+     * @param relativePath String
+     *
+     * @param updatedLocation String
+     */
+    updateLocation ( originalLocation, relativePath) {
+
+        if (originalLocation.indexOf(relativePath + "/") !== 0) {
+            return relativePath + "/" + originalLocation;
+        }
+  
+        return originalLocation;
+    }    
 
     /**
      * Search service paths recursively for Serverless configration fragment files
