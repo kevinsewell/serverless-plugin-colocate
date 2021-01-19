@@ -1,6 +1,6 @@
 {
   "name": "serverless-plugin-colocate",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Serverless Plugin to Colocate your Configuration and Code",
   "main": "src/index.js",
   "scripts": {
