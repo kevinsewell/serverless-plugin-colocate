@@ -98,8 +98,11 @@ class ServerlessPluginColocate {
      * @returns {Promise}
      */
     printColocateUsage() {
-        this.serverless.cli.generateCommandsHelp(["colocate"]);
 
+        if (this.serverless.cli.generateCommandsHelp){
+            this.serverless.cli.generateCommandsHelp(["colocate"]);    
+        }
+        
         return BbPromise.resolve();
     }
 
@@ -131,6 +134,15 @@ class ServerlessPluginColocate {
     mergeCodeFragmentsIntoService() {
         this.getConfigFragmentFilenames()
             .forEach(this.mergeConfigFragmentIntoService.bind(this));
+
+        //
+        // after serverless@2.26.0. variables are resolved before the plugins are called
+        // thus we need to explicitly repopulate variables after merging the fragments
+        //
+        if (this.serverless.variables && this.serverless.variables.populateService && 
+            typeof this.serverless.variables.populateService === 'function') {
+            this.serverless.variables.populateService(this.serverless.pluginManager.cliOptions);        
+        }
     }
 
     /**
