@@ -172,7 +172,7 @@ class ServerlessPluginColocate {
              
         }
 
-        this.extendServiceConfigurationWithObject([],configFragment) this.extendServiceConfigurationWithObject([],configFragment);
+        this.extendServiceConfigurationWithObject([],configFragment);
     }
     
     /**
