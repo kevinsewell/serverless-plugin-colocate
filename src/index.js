@@ -216,7 +216,7 @@ class ServerlessPluginColocate {
             configurationPathKeys = []
         }
 
-        if (typeof value == 'object'){
+        if (value && typeof value == 'object'){
             Object.keys(value).forEach(key => {
                   this.extendServiceConfigurationWithObject(this.appendConfigurationPathKey(configurationPathKeys, key), value[key]);
                 });
@@ -241,7 +241,7 @@ class ServerlessPluginColocate {
         const patterns = this.getCustomDefaultInclude() || ["**/*.yml", "**/*.yaml"];
 
         const defaultExclude = this.getCustomDefaultExclude() ||
-            ["serverless.yml", "node_modules/**"];
+            ["serverless.yml", "node_modules/**", "vendor/**"];
 
         defaultExclude.forEach((pattern) => addExcludePattern(pattern, patterns));
 
