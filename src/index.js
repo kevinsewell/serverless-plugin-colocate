@@ -134,15 +134,6 @@ class ServerlessPluginColocate {
     mergeCodeFragmentsIntoService() {
         this.getConfigFragmentFilenames()
             .forEach(this.mergeConfigFragmentIntoService.bind(this));
-
-        //
-        // after serverless@2.26.0. variables are resolved before the plugins are called
-        // thus we need to explicitly repopulate variables after merging the fragments
-        //
-        if (this.serverless.variables && this.serverless.variables.populateService && 
-            typeof this.serverless.variables.populateService === 'function') {
-            this.serverless.variables.populateService(this.serverless.pluginManager.cliOptions);        
-        }
     }
 
     /**
@@ -181,7 +172,7 @@ class ServerlessPluginColocate {
              
         }
 
-        this.serverless.service = _.merge(this.serverless.service || {}, configFragment);
+        this.extendServiceConfigurationWithObject([],configFragment);
     }
     
     /**
@@ -201,6 +192,43 @@ class ServerlessPluginColocate {
         return originalLocation;
     }    
 
+     /**
+     * Append a key to the list of configurationPathKeys
+     *
+     * @param configurationPathKeys
+     * @param key
+     */
+    appendConfigurationPathKey(configurationPathKeys, key){
+        let keys_ = _.cloneDeep(configurationPathKeys)
+        keys_.push(key)
+        return keys_;
+    }
+
+    /**
+     * Extend the serverless Configuration with and object
+     *
+     * @param configurationPathKeys array of path keys e.g. [['provider'],['name']]
+     * @param value e.g. aws
+     */
+    extendServiceConfigurationWithObject(configurationPathKeys, value){
+
+        if (!configurationPathKeys){
+            configurationPathKeys = []
+        }
+
+        if (value && typeof value == 'object'){
+            Object.keys(value).forEach(key => {
+                  this.extendServiceConfigurationWithObject(this.appendConfigurationPathKey(configurationPathKeys, key), value[key]);
+                });
+        }
+        else if (Array.isArray(value)){
+            value.forEach((element) => this.extendServiceConfigurationWithObject(configurationPathKeys, element));
+        }
+        else if (value){
+            this.serverless.extendConfiguration(configurationPathKeys, value);
+        }
+    }
+
     /**
      * Search service paths recursively for Serverless configration fragment files
      *
@@ -213,7 +241,7 @@ class ServerlessPluginColocate {
         const patterns = this.getCustomDefaultInclude() || ["**/*.yml", "**/*.yaml"];
 
         const defaultExclude = this.getCustomDefaultExclude() ||
-            ["serverless.yml", "node_modules/**"];
+            ["serverless.yml", "node_modules/**", "vendor/**"];
 
         defaultExclude.forEach((pattern) => addExcludePattern(pattern, patterns));
 

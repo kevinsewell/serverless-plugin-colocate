@@ -31,5 +31,8 @@
     "globby": "^8.0.1",
     "js-yaml": "^3.11.0",
     "lodash": "^4.17.10"
+  },
+  "peerDependencies":{
+    "serverless": "^3.26.0"
   }
 }
